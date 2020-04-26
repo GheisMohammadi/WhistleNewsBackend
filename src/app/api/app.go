@@ -6,8 +6,8 @@ import (
 )
 
 /**
-* POST /api/v1/skill
+* POST /v1/counter
  */
 func (api *API) Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Get index")
+	fmt.Fprintln(w, http.StatusOK)
 }

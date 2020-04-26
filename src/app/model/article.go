@@ -33,29 +33,51 @@ func InitializeArticle() *Article {
 }
 
 //AddView adds new new to an article
-func (article *Article) AddView(ref string, count uint64) {
+func (article *Article) AddView(ref time.Time, count uint64) error{
 
-	newArticleView := &ArticleView{Reference: ref, Count: count}
-	article.Views = append(article.Views, newArticleView)
-
+	t:= ref.Format("2006-01-02T15:04")
+	n:=len(article.Views)
+	if (n>0 && article.Views[n-1].Reference == t){
+		article.Views[n-1].Count += count
+	}else{
+		newArticleView := &ArticleView{Reference: t, Count: count}
+		article.Views = append(article.Views, newArticleView)
+	}
+	return nil
 }
 
-//ArticleReq defines req for article
+//ArticleReq defines req for article creation
 type ArticleReq struct {
-	ID    string   `json:"id" xml:"id" form:"id" valid:"required"`
-	Views []string `json:"views" xml:"views" form:"views" valid:"required"`
+	ID string `json:"id" xml:"id" form:"id" valid:"required"`
 }
 
-//FieldMap for mapping request
-func (l *ArticleReq) FieldMap(r *http.Request) binding.FieldMap {
+//FieldMap for mapping request to article req
+func (ar *ArticleReq) FieldMap(r *http.Request) binding.FieldMap {
 	return binding.FieldMap{
-		&l.ID:    "id",
-		&l.Views: "views",
+		&ar.ID: "id",
 	}
 }
 
-//ArticleViewMes viewed message
-type ArticleViewMes struct {
-	ID      string `json:"id" xml:"id" form:"id" valid:"required"`
+//ArticleViewReq defines request for new view for specific article
+type ArticleViewReq struct {
+	ID string `json:"id" xml:"id" form:"id" valid:"required"`
+}
+
+//FieldMap for mapping request to view req
+func (ar *ArticleViewReq) FieldMap(r *http.Request) binding.FieldMap {
+	return binding.FieldMap{
+		&ar.ID: "id",
+	}
+}
+
+//ArticleCreatedMsg created message
+type ArticleCreatedMsg struct {
+	ID    string `json:"id" xml:"id" form:"id" valid:"required"`
+	Session string `json:"session" xml:"session" form:"session" valsession:"required"`
+}
+
+//ArticleViewedMsg viewed message
+type ArticleViewedMsg struct {
+	ID    string `json:"id" xml:"id" form:"id" valid:"required"`
 	Session string `json:"session" xml:"session" form:"session" valsession:"required"`
 }
