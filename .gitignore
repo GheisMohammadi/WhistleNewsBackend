@@ -20,3 +20,7 @@ main
 WhistleNewsBackend
 
 Gopkg.lock
+
+data/
+
+docker-compose.yaml

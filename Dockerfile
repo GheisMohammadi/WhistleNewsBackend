@@ -1,24 +1,25 @@
 FROM golang:latest
 
+#install Whisle News Backend
 RUN go get github.com/golang/dep/cmd/dep
 RUN go get github.com/posener/wstest
 RUN go get github.com/oxequa/realize
 RUN go get github.com/stretchr/testify
 
 WORKDIR /go/src/
-RUN mkdir -p WhistleNews
-WORKDIR /go/src/WhistleNews
+RUN mkdir -p WhistleNewsBackend
+WORKDIR /go/src/WhistleNewsBackend
 
 COPY . .
 
 RUN dep ensure -update
 
-RUN go build
+RUN go build -o whistlenewsservice
 RUN go install .
 
-#RUN go get -t -v ./...
-#RUN go install .
-#RUN go-wrapper download
-#RUN go-wrapper install
+EXPOSE 3085
 
-EXPOSE 4040
+RUN chmod 777 whistlenewsservice
+#RUN ./whistlenewsservice
+
+CMD ["/go/src/WhistleNewsBackend/whistlenewsservice"]

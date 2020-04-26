@@ -18,18 +18,23 @@ $ cd WhistleNewsBackend/src/app
 $ go build
 ```
 ## Running
-First, setup docker and go to root folder that contains Dockerfile
 
+1- install mongodb
+    - you can run it using docker by this command:
+    ```bash
+     docker run -d -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4
+    ```
+2- create db name "WhistleNews" and create collection with name "articles"
+3- install NSQ and run services
+    - download proper binary package from here (https://nsq.io/deployment/installing.html)
+    - follow those steps here (https://nsq.io/overview/quick_start.html) and make sure it works correctly!
+4- go to root folder that contains Dockerfile
 ```bash
-$ docker build --tag WhistleNewsBackend .
+$ sudo docker build --tag "whistlebackend" .
+$ sudo docker run --network="host" "whistlebackend"
 ```
 
-Then start querying at `http://localhost:3000/counter/v1/`
-
-## Shutdown
-```bash
-$ docker 
-```
+Then start querying at `http://localhost:3085/counter/v1/`
 
 ## APIs
 The entity **Article** has the following fields:
