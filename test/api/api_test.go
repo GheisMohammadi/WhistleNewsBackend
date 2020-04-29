@@ -1,47 +1,31 @@
-package server
+package api_test
 
 import (
+	"net/http"
+	"testing"
+
 	"WhistleNewsBackend/api"
 	"WhistleNewsBackend/db"
+	"WhistleNewsBackend/model"
 	"WhistleNewsBackend/repo"
-	"WhistleNewsBackend/routes"
 	"WhistleNewsBackend/worker"
 	"WhistleNewsBackend/ws"
-	"WhistleNewsBackend/config"
+
+	config "WhistleNewsBackend/config"
+
 	"github.com/gorilla/mux"
 )
 
 var (
 	svc       *api.API
-	websocket *ws.WebSocket
+	articleId string
+	r         *mux.Router
 )
 
-//NewRouter creates a router from all Routes
-func NewRouter() *mux.Router {
-
-	routes := routes.LoadRoutes(svc, websocket)
-	router := mux.NewRouter().StrictSlash(true)
-	router = router.PathPrefix(config.APIPrefix).Subrouter()
-	for _, route := range routes {
-		router.
-			Methods(route.Method).
-			Path(route.Pattern).
-			Name(route.Name).
-			Handler(route.HandlerFunc)
-	}
-
-	return router
-}
-
-//Init initiates mongodb and NSQ
-func Init() {
+func init() {
 	//ws hub
 	hub := ws.NewHub()
 	go hub.Run()
-
-	websocket = &ws.WebSocket{
-		Hub: hub,
-	}
 
 	// Initialize connetion pool with mongo
 	mongo := &db.MONGO{
@@ -66,4 +50,30 @@ func Init() {
 		Nsq:  nSQ,
 	}
 
+	// Create route with context
+	r = mux.NewRouter()
+	r.HandleFunc("/statistics/article_id/{id}", svc.GetArticle)
+
+	http.Handle("/", r)
+
+}
+
+func SetUp() {
+	article := model.InitializeArticle()
+	articleId = article.ID
+
+	db, session := svc.Repo.GetMgSession()
+	defer session.Close()
+	db.C("articles").Insert(&article)
+}
+
+func TearDown(collection string) {
+	db, session := svc.Repo.GetMgSession()
+	db.C(collection).RemoveAll(nil)
+	session.Close()
+}
+
+func TestMain(m *testing.M) {
+	SetUp()
+	TearDown("articles")
 }

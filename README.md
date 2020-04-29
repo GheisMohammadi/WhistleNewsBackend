@@ -21,14 +21,21 @@ $ go build
 
 1- install mongodb
     - you can run it using docker by this command:
+
     ```bash
-     docker run -d -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4
+    $ sudo docker run -d -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4
     ```
+
 2- create db name "WhistleNews" and create collection with name "articles"
+
 3- install NSQ and run services
+
     - download proper binary package from here (https://nsq.io/deployment/installing.html)
+
     - follow those steps here (https://nsq.io/overview/quick_start.html) and make sure it works correctly!
+
 4- go to root folder that contains Dockerfile
+
 ```bash
 $ sudo docker build --tag "whistlebackend" .
 $ sudo docker run --network="host" "whistlebackend"
@@ -46,5 +53,6 @@ Follows the list of article APIs:
 
 |METHOD|URL|REQUEST HEADERS|REQUEST PAYLOAD|RESPONSE HEADERS|RESPONSE PAYLOAD|
 |------|---|---------------|---------------|----------------|----------------|
-|GET|http://localhost:3000/counter/v1/statistics/ | | | |Article Object|
-|POST|http://localhost:3000/counter/v1/statistics/article_id/ |Content-Type: "application/json"|Article Views||Article Views|
+|POST|http://localhost:3085/counter/v1/statistics/ |Content-Type: "application/json"|Article ID| |Article Object|
+|POST|http://localhost:3085/counter/v1/article/add |Content-Type: "application/json"|Article ID| |Article Object|
+|GET |http://localhost:3085/counter/v1/statistics/article_id/{id} ||||Article Views|
