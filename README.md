@@ -20,7 +20,8 @@ $ go build
 ## Running
 
 1- install mongodb
-    - you can run it using docker by this command:
+
+you can run it using docker by this command:
 
     ```bash
     $ sudo docker run -d -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4
@@ -45,7 +46,7 @@ Then start querying at `http://localhost:3085/counter/v1/`
 
 ## Tests
 
-for test coverage of test (94.9%) you can use following commands:
+For do testing, you can use following commands:
 
 ```bash
 $ go test ./test/api
@@ -61,12 +62,22 @@ $ go test -v ./...
 
 ## Test coverage
 
-for test coverage of test (94.9%) you can use following commands:
+for testing coverage of the tests, you can use following commands:
 
 ```bash
+$ go test ./... -coverprofile cover.out
+$ go tool cover -html=cover.out -o coverage.html
+```
 
-$ go test -coverprofile fmtcoverage.html fmt
+and to see total coverage:
+```bash
+$ go tool cover -func cover.out | grep total
+```
 
+the output will be like this:
+
+```bash
+total:                                  (statements)            76.7%
 ```
 
 ## APIs
