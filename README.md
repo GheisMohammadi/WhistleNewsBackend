@@ -12,7 +12,7 @@ WhistleNews is a news portal for whistleblowers. Registered authors would be abl
 ## Install
 Clone and setup:
 
-```bash
+```console
 $ git clone https://github.com/GheisMohammadi/WhistleNewsBackend.git
 $ cd WhistleNewsBackend/src/app
 $ go build
@@ -23,7 +23,7 @@ $ go build
 
 you can run it using docker by this command:
 
-    ```bash
+    ```console
     $ sudo docker run -d -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4
     ```
 
@@ -37,7 +37,7 @@ you can run it using docker by this command:
 
 4- go to root folder that contains Dockerfile
 
-```bash
+```console
 $ sudo docker build --tag "whistlebackend" .
 $ sudo docker run --network="host" "whistlebackend"
 ```
@@ -46,37 +46,29 @@ Then start querying at `http://localhost:3085/counter/v1/`
 
 ## Tests
 
-For do testing, you can use following commands:
+For do testing, you can use the following command:
 
-```bash
-$ go test ./test/api
-$ go test ./test/repo
-```
-
-or you can use:
-
-```bash
+```console
 $ go test -v ./...
 ```
-
 
 ## Test coverage
 
 for testing coverage of the tests, you can use following commands:
 
-```bash
+```console
 $ go test ./... -coverprofile cover.out
 $ go tool cover -html=cover.out -o coverage.html
 ```
 
 and to see total coverage:
-```bash
+```console
 $ go tool cover -func cover.out | grep total
 ```
 
 the output will be like this:
 
-```bash
+```console
 total:                                  (statements)            76.7%
 ```
 
