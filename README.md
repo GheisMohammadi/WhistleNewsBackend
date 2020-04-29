@@ -12,7 +12,7 @@ WhistleNews is a news portal for whistleblowers. Registered authors would be abl
 ## Install
 Clone and setup:
 
-```bash
+```console
 $ git clone https://github.com/GheisMohammadi/WhistleNewsBackend.git
 $ cd WhistleNewsBackend/src/app
 $ go build
@@ -20,9 +20,10 @@ $ go build
 ## Running
 
 1- install mongodb
-    - you can run it using docker by this command:
 
-    ```bash
+you can run it using docker by this command:
+
+    ```console
     $ sudo docker run -d -p 27017-27019:27017-27019 --name mongodb mongo:4.0.4
     ```
 
@@ -30,18 +31,46 @@ $ go build
 
 3- install NSQ and run services
 
-    - download proper binary package from here (https://nsq.io/deployment/installing.html)
+    - download proper binary package from [NSQ Binary Packages](https://nsq.io/deployment/installing.html)
 
-    - follow those steps here (https://nsq.io/overview/quick_start.html) and make sure it works correctly!
+    - run a small NSQ cluster on your local machine by following [NSQ Installtion](https://nsq.io/overview/quick_start.html) and make sure it works correctly!
 
 4- go to root folder that contains Dockerfile
 
-```bash
+```console
 $ sudo docker build --tag "whistlebackend" .
 $ sudo docker run --network="host" "whistlebackend"
 ```
 
 Then start querying at `http://localhost:3085/counter/v1/`
+
+## Tests
+
+For do testing, you can use the following command:
+
+```console
+$ go test -v ./...
+```
+
+## Test coverage
+
+for testing coverage of the tests, you can use following commands:
+
+```console
+$ go test ./... -coverprofile cover.out
+$ go tool cover -html=cover.out -o coverage.html
+```
+
+and to see total coverage:
+```console
+$ go tool cover -func cover.out | grep total
+```
+
+the output will be like this:
+
+```console
+total:                                  (statements)            76.7%
+```
 
 ## APIs
 The entity **Article** has the following fields:

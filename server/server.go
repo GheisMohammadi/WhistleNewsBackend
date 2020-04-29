@@ -57,6 +57,7 @@ func Init() {
 	nSQ := workers.InitNSQ(config.NSQURL, hub, sharedRepo)
 	err := nSQ.CreateHandler(nSQ.ArticleViewsHandler, "article_viewd", "statistics")
 	if err != nil {
+		println("initialization of NSQ failed! check if NSQ services is running on your local system")
 		panic(err)
 	}
 

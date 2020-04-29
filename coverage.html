@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">WhistleNewsBackend/db/mongo.go (70.0%)</option>
+				
+				<option value="file1">WhistleNewsBackend/model/article.go (70.0%)</option>
+				
+				<option value="file2">WhistleNewsBackend/repo/article.go (90.5%)</option>
+				
+				<option value="file3">WhistleNewsBackend/repo/main.go (100.0%)</option>
+				
+				<option value="file4">WhistleNewsBackend/utils/times.go (66.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package db
+
+import (
+        "errors"
+
+        "gopkg.in/mgo.v2"
+)
+
+/*
+Mongo construction
+*/
+//Mongo struct hold uri based on environment
+type MONGO struct {
+        Uri      string
+        Database string
+        Session  *mgo.Session
+}
+
+//Establish connection to mongodb
+func (mongo *MONGO) Dial() <span class="cov8" title="1">{
+        session, err := mgo.Dial(mongo.Uri)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">mongo.Session = session</span>
+}
+
+// Get session
+func (mongo *MONGO) GetSession() (*mgo.Database, *mgo.Session) <span class="cov8" title="1">{
+        if mongo.Session == nil </span><span class="cov0" title="0">{
+                panic(errors.New("Db session not exist"))</span>
+                <span class="cov0" title="0">return nil, nil</span>
+        }
+
+        <span class="cov8" title="1">newSession := mongo.Session.Copy()
+        db := newSession.DB(mongo.Database)
+
+        return db, newSession</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package model
+
+import (
+        "net/http"
+        "time"
+
+        "github.com/mholt/binding"
+        "gopkg.in/mgo.v2/bson"
+)
+
+//ArticleView object
+type ArticleView struct {
+        Reference string `bson:"reference" json:"reference" valid:"required"`
+        Count     uint64 `bson:"count" json:"count" valid:"required"`
+}
+
+//Article object
+type Article struct {
+        ID        string         `bson:"_id" json:"_id" valid:"required"`
+        Views     []*ArticleView `bson:"views" json:"views" valid:"required"`
+        CreatedAt time.Time      `bson:"createdAt" json:"createdAt" valid:"required"`
+        UpdatedAt time.Time      `bson:"updatedAt" json:"updatedAt" valid:"required"`
+}
+
+//InitializeArticle Initializes an article
+func InitializeArticle() *Article <span class="cov8" title="1">{
+        return &amp;Article{
+                ID:        bson.NewObjectId().Hex(),
+                Views:     make([]*ArticleView, 0),
+                CreatedAt: time.Now(),
+                UpdatedAt: time.Now(),
+        }
+}</span>
+
+//AddView adds new new to an article
+func (article *Article) AddView(ref time.Time, count uint64) error<span class="cov8" title="1">{
+
+        t:= ref.Format("2006-01-02T15:04")
+        n:=len(article.Views)
+        if (n&gt;0 &amp;&amp; article.Views[n-1].Reference == t)</span><span class="cov0" title="0">{
+                article.Views[n-1].Count += count
+        }</span>else<span class="cov8" title="1">{
+                newArticleView := &amp;ArticleView{Reference: t, Count: count}
+                article.Views = append(article.Views, newArticleView)
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+//ArticleReq defines req for article creation
+type ArticleReq struct {
+        ID string `json:"id" xml:"id" form:"id" valid:"required"`
+}
+
+//FieldMap for mapping request to article req
+func (ar *ArticleReq) FieldMap(r *http.Request) binding.FieldMap <span class="cov0" title="0">{
+        return binding.FieldMap{
+                &amp;ar.ID: "id",
+        }
+}</span>
+
+//ArticleViewReq defines request for new view for specific article
+type ArticleViewReq struct {
+        ID string `json:"id" xml:"id" form:"id" valid:"required"`
+}
+
+//FieldMap for mapping request to view req
+func (ar *ArticleViewReq) FieldMap(r *http.Request) binding.FieldMap <span class="cov0" title="0">{
+        return binding.FieldMap{
+                &amp;ar.ID: "id",
+        }
+}</span>
+
+//ArticleCreatedMsg created message
+type ArticleCreatedMsg struct {
+        ID    string `json:"id" xml:"id" form:"id" valid:"required"`
+        Session string `json:"session" xml:"session" form:"session" valsession:"required"`
+}
+
+//ArticleViewedMsg viewed message
+type ArticleViewedMsg struct {
+        ID    string `json:"id" xml:"id" form:"id" valid:"required"`
+        Session string `json:"session" xml:"session" form:"session" valsession:"required"`
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package repo
+
+import (
+        "time"
+
+        "WhistleNewsBackend/model"
+        "gopkg.in/mgo.v2/bson"
+)
+
+//CreateArticle creates new article in db
+func (repo *Repo) CreateArticle(article *model.Article) error <span class="cov8" title="1">{
+        db, session := repo.GetMgSession()
+        defer session.Close()
+        err := db.C("articles").Insert(article)
+        return err
+}</span>
+
+//GetArticle fetchs article from db
+func (repo *Repo) GetArticle(id string) (*model.Article, error) <span class="cov8" title="1">{
+        db, session := repo.GetMgSession()
+        defer session.Close()
+        var article model.Article
+        err := db.C("articles").Find(bson.M{"_id": id}).One(&amp;article)
+        if err != nil </span><span class="cov0" title="0">{
+                return &amp;model.Article{}, err
+        }</span>
+        <span class="cov8" title="1">return &amp;article, nil</span>
+}
+
+//AddViewToArticle adds new view to article in db
+func (repo *Repo) AddViewToArticle(id string) error <span class="cov8" title="1">{
+        db, session := repo.GetMgSession()
+        defer session.Close()
+        var article model.Article
+        err := db.C("articles").Find(bson.M{"_id": id}).One(&amp;article)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">article.AddView(time.Now(), 1)
+        article.UpdatedAt = time.Now()
+        errUpdate := db.C("articles").Update(bson.M{"_id": id}, article)
+
+        return errUpdate</span>
+}</pre>
+		
+		<pre class="file" id="file3" style="display: none">package repo
+
+import (
+        "gopkg.in/mgo.v2"
+
+        "WhistleNewsBackend/db"
+)
+
+/**
+* Repo hold different datasources
+* Initialize Repo on each request
+ */
+type Repo struct {
+        Mongo *db.MONGO
+}
+
+func (repo *Repo) GetMgSession() (*mgo.Database, *mgo.Session) <span class="cov8" title="1">{
+        return repo.Mongo.GetSession()
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package utils
+
+import (
+        "strconv"
+        "time"
+)
+
+//TimeSince returns string for time duration like "3 minutes ago" ...
+func TimeSince(s time.Time) string <span class="cov8" title="1">{
+
+        now := time.Now()
+
+        dur := now.Sub(s)
+        if dur.Seconds() &lt;= 0 </span><span class="cov0" title="0">{
+                return "future!"
+        }</span>
+
+        <span class="cov8" title="1">years := int64(dur.Hours() / 8760.0) 
+        if years &gt; 1 </span><span class="cov8" title="1">{
+                return strconv.FormatInt(years, 10) + " years ago"
+        }</span>
+
+        <span class="cov8" title="1">months := int64(dur.Hours() / 720.0)
+        if months &gt; 1 </span><span class="cov8" title="1">{
+                return strconv.FormatInt(months, 10) + " months ago"
+        }</span>
+
+        <span class="cov8" title="1">days := int64(dur.Hours() / 24.0)
+        if days &gt; 1 </span><span class="cov8" title="1">{
+                return strconv.FormatInt(days, 10) + " days ago"
+        }</span>
+
+        <span class="cov0" title="0">if dur.Hours() &gt; 1 </span><span class="cov0" title="0">{
+                return strconv.FormatInt(int64(dur.Hours()), 10) + " hours ago"
+        }</span>
+
+        <span class="cov0" title="0">if dur.Minutes() &gt; 1 </span><span class="cov0" title="0">{
+                return strconv.FormatInt(int64(dur.Minutes()), 10) + " minutes ago"
+        }</span>
+
+        <span class="cov0" title="0">return strconv.FormatInt(int64(dur.Seconds()), 10) + " seconds ago"</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
