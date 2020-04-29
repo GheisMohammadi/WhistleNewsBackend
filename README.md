@@ -30,9 +30,9 @@ $ go build
 
 3- install NSQ and run services
 
-    - download proper binary package from here (https://nsq.io/deployment/installing.html)
+    - download proper binary package from [NSQ Binary Packages](https://nsq.io/deployment/installing.html)
 
-    - follow those steps here (https://nsq.io/overview/quick_start.html) and make sure it works correctly!
+    - run a small NSQ cluster on your local machine by following [NSQ Installtion](https://nsq.io/overview/quick_start.html) and make sure it works correctly!
 
 4- go to root folder that contains Dockerfile
 
@@ -42,6 +42,32 @@ $ sudo docker run --network="host" "whistlebackend"
 ```
 
 Then start querying at `http://localhost:3085/counter/v1/`
+
+## Tests
+
+for test coverage of test (94.9%) you can use following commands:
+
+```bash
+$ go test ./test/api
+$ go test ./test/repo
+```
+
+or you can use:
+
+```bash
+$ go test -v ./...
+```
+
+
+## Test coverage
+
+for test coverage of test (94.9%) you can use following commands:
+
+```bash
+
+$ go test -coverprofile fmtcoverage.html fmt
+
+```
 
 ## APIs
 The entity **Article** has the following fields:

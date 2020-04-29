@@ -27,7 +27,7 @@ func TestGetArticle(t *testing.T) {
 	db, session := prepArticle.Repo.GetMgSession()
 	defer session.Close()
 	db.C("articles").Insert(article)
-	result, err := prepArticle.Repo.GetJob(article.ID)
+	result, err := prepArticle.Repo.GetArticle(article.ID)
 	if err != nil {
 		t.Error(err)
 	}
